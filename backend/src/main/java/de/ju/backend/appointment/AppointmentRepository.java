@@ -47,22 +47,7 @@ public class AppointmentRepository {
     }
 
     public void updateAppointment(Appointment appointment, String time) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(appointment.getDate());
-
-        String[] timeParts = time.split(":");
-        if (timeParts.length != 3) {
-            throw new IllegalArgumentException("Invalid time format. Expected format: HH:mm:ss");
-        }
-
-        int hours = Integer.parseInt(timeParts[0]) + 1;
-        int minutes = Integer.parseInt(timeParts[1]);
-        int seconds = Integer.parseInt(timeParts[2]);
-
-        calendar.set(java.util.Calendar.HOUR_OF_DAY, hours);
-        calendar.set(java.util.Calendar.MINUTE, minutes);
-        calendar.set(java.util.Calendar.SECOND, seconds);
-        calendar.set(java.util.Calendar.MILLISECOND, 0);
+        Calendar calendar = getCalendar(appointment, time);
 
         java.sql.Timestamp appointmentTimestamp = new java.sql.Timestamp(calendar.getTimeInMillis());
 
@@ -80,5 +65,25 @@ public class AppointmentRepository {
         } catch (SQLException e) {
             throw new RuntimeException("Error updating appointment for date and time: " + appointment.getDate() + " " + time, e);
         }
+    }
+
+    private static Calendar getCalendar(Appointment appointment, String time) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(appointment.getDate());
+
+        String[] timeParts = time.split(":");
+        if (timeParts.length != 3) {
+            throw new IllegalArgumentException("Invalid time format. Expected format: HH:mm:ss");
+        }
+
+        int hours = Integer.parseInt(timeParts[0]) + 1;
+        int minutes = Integer.parseInt(timeParts[1]);
+        int seconds = Integer.parseInt(timeParts[2]);
+
+        calendar.set(Calendar.HOUR_OF_DAY, hours);
+        calendar.set(Calendar.MINUTE, minutes);
+        calendar.set(Calendar.SECOND, seconds);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar;
     }
 }
